@@ -1,0 +1,3 @@
+git rm -r --cached node_modules
+git commit -m "Fix: remove node_modules from tracking"
+git push
