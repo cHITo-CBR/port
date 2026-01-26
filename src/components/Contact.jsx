@@ -3,6 +3,12 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Sphere, useTexture } from "@react-three/drei";
 import { motion } from "framer-motion";
 import * as THREE from "three";
+import emailjs from "@emailjs/browser";
+
+// EmailJS Configuration
+const EMAILJS_SERVICE_ID = "service_oiv96fb";
+const EMAILJS_TEMPLATE_ID = "template_hc94wdw";
+const EMAILJS_PUBLIC_KEY = "8I19QRQRgQn-dchl_";
 
 // 3D Earth Component
 const Earth = () => {
@@ -169,6 +175,7 @@ const Contact = () => {
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -178,15 +185,33 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(false);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    setLoading(false);
-    setSuccess(true);
-    setForm({ name: "", email: "", message: "" });
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          to_name: "Chistopher",
+          message: form.message,
+        },
+        EMAILJS_PUBLIC_KEY
+      );
 
-    setTimeout(() => setSuccess(false), 5000);
+      setLoading(false);
+      setSuccess(true);
+      setForm({ name: "", email: "", message: "" });
+
+      setTimeout(() => setSuccess(false), 5000);
+    } catch (err) {
+      setLoading(false);
+      setError(true);
+      console.error("EmailJS Error:", err);
+
+      setTimeout(() => setError(false), 5000);
+    }
   };
 
   return (
@@ -305,6 +330,17 @@ const Contact = () => {
                   ✓ Thank you! I'll get back to you soon.
                 </motion.div>
               )}
+
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-red-400 text-center font-medium"
+                >
+                  ✗ Something went wrong. Please try again or email me directly.
+                </motion.div>
+              )}
             </form>
 
             {/* Social Links */}
@@ -312,7 +348,7 @@ const Contact = () => {
               <p className="text-secondary text-sm mb-4">Or reach me directly:</p>
               <div className="flex gap-4">
                 <a
-                  href="mailto:chistopher@example.com"
+                  href="mailto:chistopher.raper@urios.edu.ph"
                   className="w-12 h-12 rounded-full glass flex items-center justify-center hover:bg-electric-purple/20 transition-colors group"
                 >
                   <svg className="w-5 h-5 text-secondary group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
