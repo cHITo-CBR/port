@@ -188,18 +188,21 @@ const Contact = () => {
     setError(false);
 
     try {
-      await emailjs.send(
+      const result = await emailjs.send(
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
         {
           from_name: form.name,
           from_email: form.email,
           to_name: "Chistopher",
+          to_email: "chistopher.raper@urios.edu.ph",
           message: form.message,
+          reply_to: form.email,
         },
         EMAILJS_PUBLIC_KEY
       );
 
+      console.log("EmailJS Success:", result);
       setLoading(false);
       setSuccess(true);
       setForm({ name: "", email: "", message: "" });
@@ -208,7 +211,8 @@ const Contact = () => {
     } catch (err) {
       setLoading(false);
       setError(true);
-      console.error("EmailJS Error:", err);
+      console.error("EmailJS Error:", err.text || err.message || err);
+      alert("Error: " + (err.text || err.message || "Failed to send email. Check console for details."));
 
       setTimeout(() => setError(false), 5000);
     }
